@@ -72,4 +72,58 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
       meal,
     });
   });
+
+  app.put<{ Params: { id: string } }>('/:id', async (request, reply) => {
+    const { id } = request.user;
+    const mealId = request.params.id;
+
+    const putMealBodySchema = z.object({
+      name: z.string().optional(),
+      description: z.string().optional(),
+      datetime: z.coerce.date().optional(),
+      diet: z.boolean().optional(),
+    });
+
+    const result = await putMealBodySchema.safeParseAsync(request.body);
+
+    if (!result.success) {
+      const data = {
+        issues: result.error.issues,
+        message: 'Validation issues!',
+      };
+
+      return reply.status(400).send(data);
+    }
+
+    if (Object.keys(result.data).length === 0) {
+      return reply.status(400).send({
+        message: 'No data to edit!',
+      });
+    }
+
+    const { datetime, description, diet, name } = result.data;
+
+    const meal = await knex('meals').where({ userId: id, id: mealId }).first();
+
+    if (meal == null) {
+      return reply.status(404).send({
+        message: 'Meal not found!',
+      });
+    }
+
+    const alteredMeal: Meal = {
+      id: meal.id,
+      userId: meal.userId,
+      name: name ?? meal.name,
+      datetime: datetime != null ? datetime.toISOString() : meal.datetime,
+      description: description ?? meal.description,
+      diet: diet ?? meal.diet,
+    };
+
+    await knex('meals').where({ userId: id, id: mealId }).update(alteredMeal);
+
+    return reply.send({
+      message: 'Meal updated!',
+    });
+  });
 }
