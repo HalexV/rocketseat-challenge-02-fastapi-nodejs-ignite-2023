@@ -73,6 +73,51 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
     });
   });
 
+  app.get('/statistics', async (request, reply) => {
+    const { id } = request.user;
+
+    const statistics = {
+      meals_total: 0,
+      meals_on_diet_total: 0,
+      meals_off_diet_total: 0,
+      best_sequence_meals_on_diet: 0,
+    };
+
+    const stream = knex('meals')
+      .where({ userId: id })
+      .orderBy('datetime', 'asc')
+      .stream();
+
+    request.socket.on('close', () => {
+      stream.destroy();
+    });
+
+    let bestSequence = 0;
+
+    for await (const meal of stream) {
+      statistics.meals_total++;
+
+      if (meal.diet) {
+        statistics.meals_on_diet_total++;
+        bestSequence++;
+      } else {
+        statistics.meals_off_diet_total++;
+        if (bestSequence > statistics.best_sequence_meals_on_diet) {
+          statistics.best_sequence_meals_on_diet = bestSequence;
+        }
+        bestSequence = 0;
+      }
+    }
+
+    if (bestSequence > statistics.best_sequence_meals_on_diet) {
+      statistics.best_sequence_meals_on_diet = bestSequence;
+    }
+
+    return reply.send({
+      statistics,
+    });
+  });
+
   app.put<{ Params: { id: string } }>('/:id', async (request, reply) => {
     const { id } = request.user;
     const mealId = request.params.id;
