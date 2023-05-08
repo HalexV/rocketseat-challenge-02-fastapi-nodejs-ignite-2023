@@ -126,4 +126,23 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
       message: 'Meal updated!',
     });
   });
+
+  app.delete<{ Params: { id: string } }>('/:id', async (request, reply) => {
+    const { id } = request.user;
+    const mealId = request.params.id;
+
+    const meal = await knex('meals').where({ userId: id, id: mealId }).first();
+
+    if (meal == null) {
+      return reply.status(404).send({
+        message: 'Meal not found!',
+      });
+    }
+
+    await knex('meals').where({ userId: id, id: mealId }).del();
+
+    return reply.send({
+      message: 'Meal deleted!',
+    });
+  });
 }
