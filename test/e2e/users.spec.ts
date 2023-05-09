@@ -95,8 +95,6 @@ describe('Users routes', () => {
           password: 123,
         });
 
-      console.dir(userAuthenticateResponse.body, { depth: null });
-
       const expectedResponseBody = {
         issues: [
           {
@@ -114,6 +112,22 @@ describe('Users routes', () => {
           },
         ],
         message: 'Validation issues!',
+      };
+
+      expect(userAuthenticateResponse.status).toBe(400);
+      expect(userAuthenticateResponse.body).toEqual(expectedResponseBody);
+    });
+
+    it('should not be able to authenticate an user that does not exist', async () => {
+      const userAuthenticateResponse = await request(app.server)
+        .post('/users/authenticate')
+        .send({
+          email: 'test@test.com',
+          password: 'abc1234',
+        });
+
+      const expectedResponseBody = {
+        message: 'Email or password incorrect!',
       };
 
       expect(userAuthenticateResponse.status).toBe(400);
