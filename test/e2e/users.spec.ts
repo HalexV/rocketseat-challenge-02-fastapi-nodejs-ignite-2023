@@ -138,5 +138,24 @@ describe('Users routes', () => {
       expect(userAuthenticateResponse.status).toBe(400);
       expect(userAuthenticateResponse.body).toEqual(expectedResponseBody);
     });
+
+    it('should be able to authenticate an user', async () => {
+      await request(app.server).post('/users').send({
+        email: 'test@test.com',
+        password: 'abc1234',
+      });
+
+      const userAuthenticateResponse = await request(app.server)
+        .post('/users/authenticate')
+        .send({
+          email: 'test@test.com',
+          password: 'abc1234',
+        });
+
+      expect(userAuthenticateResponse.status).toBe(200);
+      expect(userAuthenticateResponse.body.message).toBe('User authenticated!');
+      expect(userAuthenticateResponse.body).toHaveProperty('token');
+      expect(typeof userAuthenticateResponse.body.token).toBe('string');
+    });
   });
 });
