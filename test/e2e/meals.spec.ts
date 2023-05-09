@@ -105,5 +105,24 @@ describe('Meals routes', () => {
       expect(mealCreateResponse.status).toBe(400);
       expect(mealCreateResponse.body).toEqual(expectedResponseBody);
     });
+
+    it('should be able to create a meal', async () => {
+      const mealCreateResponse = await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send({
+          name: 'Test meal',
+          description: 'A test meal',
+          diet: true,
+          datetime: new Date('2023-05-01T13:00:00.000Z').toISOString(),
+        });
+
+      const expectedResponseBody = {
+        message: 'Meal created!',
+      };
+
+      expect(mealCreateResponse.status).toBe(201);
+      expect(mealCreateResponse.body).toEqual(expectedResponseBody);
+    });
   });
 });
