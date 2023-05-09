@@ -64,4 +64,23 @@ describe('Users routes', () => {
     expect(userCreateResponse.status).toBe(400);
     expect(userCreateResponse.body).toEqual(expectedResponseBody);
   });
+
+  it('should not be able to create a new user that already exists', async () => {
+    await request(app.server).post('/users').send({
+      email: 'test@test.com',
+      password: 'abc1234',
+    });
+
+    const userCreateResponse = await request(app.server).post('/users').send({
+      email: 'test@test.com',
+      password: 'abc1234',
+    });
+
+    const expectedResponseBody = {
+      message: 'User already exists!',
+    };
+
+    expect(userCreateResponse.status).toBe(400);
+    expect(userCreateResponse.body).toEqual(expectedResponseBody);
+  });
 });
