@@ -118,12 +118,17 @@ describe('Users routes', () => {
       expect(userAuthenticateResponse.body).toEqual(expectedResponseBody);
     });
 
-    it('should not be able to authenticate an user that does not exist', async () => {
+    it('should not be able to authenticate an user with wrong password', async () => {
+      await request(app.server).post('/users').send({
+        email: 'test@test.com',
+        password: 'abc1234',
+      });
+
       const userAuthenticateResponse = await request(app.server)
         .post('/users/authenticate')
         .send({
           email: 'test@test.com',
-          password: 'abc1234',
+          password: 'abc1235',
         });
 
       const expectedResponseBody = {
