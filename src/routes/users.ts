@@ -44,7 +44,7 @@ export async function usersRoutes(app: FastifyInstance): Promise<void> {
 
     await knex('users').insert(user);
 
-    return reply.send({
+    return reply.status(201).send({
       message: 'User created!',
     });
   });
