@@ -3,9 +3,7 @@ import fastify from 'fastify';
 import { usersRoutes } from './routes/users';
 import { mealsRoutes } from './routes/meals';
 
-const app = fastify({
-  logger: true,
-});
+const app = fastify();
 
 app.get('/', async (request, reply) => {
   return { hello: 'world' };
