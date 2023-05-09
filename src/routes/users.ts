@@ -12,7 +12,7 @@ export async function usersRoutes(app: FastifyInstance): Promise<void> {
   app.post('/', async (request, reply) => {
     const getUserBodySchema = z.object({
       email: z.string().email(),
-      password: z.string(),
+      password: z.string().min(6),
     });
 
     const result = await getUserBodySchema.safeParseAsync(request.body);
