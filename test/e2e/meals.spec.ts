@@ -320,5 +320,17 @@ describe('Meals routes', () => {
       expect(editMealResponse.status).toBe(400);
       expect(editMealResponse.body).toEqual(expectedResponse);
     });
+
+    it('should not be able to edit a meal with no data', async () => {
+      const editMealResponse = await request(app.server)
+        .put('/meals/asdf-asdf-asdf-asdf')
+        .set('Authorization', credentials.userAToken)
+        .send({
+          whatever: true,
+        });
+
+      expect(editMealResponse.status).toBe(400);
+      expect(editMealResponse.body.message).toBe('No data to edit!');
+    });
   });
 });
