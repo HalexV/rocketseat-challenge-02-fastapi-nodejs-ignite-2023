@@ -332,5 +332,15 @@ describe('Meals routes', () => {
       expect(editMealResponse.status).toBe(400);
       expect(editMealResponse.body.message).toBe('No data to edit!');
     });
+
+    it('should not be able to edit a meal that does not exist', async () => {
+      const editMealResponse = await request(app.server)
+        .put('/meals/asdf-asdf-asdf-asdf')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      expect(editMealResponse.status).toBe(404);
+      expect(editMealResponse.body.message).toBe('Meal not found!');
+    });
   });
 });
