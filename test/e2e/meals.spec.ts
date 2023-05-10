@@ -270,4 +270,55 @@ describe('Meals routes', () => {
       expect(getStatisticsResponse.body.statistics).toEqual(expectedStatistics);
     });
   });
+
+  describe('PUT:meals/:id', () => {
+    it('should not be able to edit a meal with invalid data', async () => {
+      const editMealResponse = await request(app.server)
+        .put('/meals/asdf-asdf-asdf-asdf')
+        .set('Authorization', credentials.userAToken)
+        .send({
+          name: 123,
+          description: 123,
+          datetime: 'asd',
+          diet: 'true',
+        });
+
+      console.dir(editMealResponse.body, { depth: null });
+
+      const expectedResponse = {
+        issues: [
+          {
+            code: 'invalid_type',
+            expected: 'string',
+            received: 'number',
+            path: ['name'],
+            message: 'Expected string, received number',
+          },
+          {
+            code: 'invalid_type',
+            expected: 'string',
+            received: 'number',
+            path: ['description'],
+            message: 'Expected string, received number',
+          },
+          {
+            code: 'invalid_date',
+            path: ['datetime'],
+            message: 'Invalid date',
+          },
+          {
+            code: 'invalid_type',
+            expected: 'boolean',
+            received: 'string',
+            path: ['diet'],
+            message: 'Expected boolean, received string',
+          },
+        ],
+        message: 'Validation issues!',
+      };
+
+      expect(editMealResponse.status).toBe(400);
+      expect(editMealResponse.body).toEqual(expectedResponse);
+    });
+  });
 });
