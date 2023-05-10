@@ -176,4 +176,30 @@ describe('Meals routes', () => {
       expect(meals[2]).toMatchObject(validInputMeals[2]);
     });
   });
+
+  describe('GET:meals/:id', () => {
+    it('should not be able to list a meal that does not exist', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[2]);
+
+      const getMealresponse = await request(app.server)
+        .get('/meals/asds-aasd-asdad-asdasd')
+        .set('Authorization', credentials.userAToken);
+
+      expect(getMealresponse.status).toBe(404);
+      expect(getMealresponse.body.message).toBe('Meal not found!');
+    });
+  });
 });

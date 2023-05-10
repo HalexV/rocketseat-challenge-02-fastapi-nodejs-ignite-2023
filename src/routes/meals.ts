@@ -52,11 +52,7 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
     const meals = await knex('meals').where({ userId: id });
 
     meals.forEach((meal) => {
-      if (meal.diet) {
-        meal.diet = true;
-      } else {
-        meal.diet = false;
-      }
+      meal.diet = Boolean(meal.diet);
     });
 
     return reply.send({
@@ -75,6 +71,8 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
         message: 'Meal not found!',
       });
     }
+
+    meal.diet = Boolean(meal.diet);
 
     return reply.send({
       meal,
