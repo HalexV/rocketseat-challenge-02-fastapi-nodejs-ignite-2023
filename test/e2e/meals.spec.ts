@@ -194,12 +194,12 @@ describe('Meals routes', () => {
         .set('Authorization', credentials.userAToken)
         .send(validInputMeals[2]);
 
-      const getMealresponse = await request(app.server)
+      const getMealResponse = await request(app.server)
         .get('/meals/asds-aasd-asdad-asdasd')
         .set('Authorization', credentials.userAToken);
 
-      expect(getMealresponse.status).toBe(404);
-      expect(getMealresponse.body.message).toBe('Meal not found!');
+      expect(getMealResponse.status).toBe(404);
+      expect(getMealResponse.body.message).toBe('Meal not found!');
     });
 
     it('should be able to list a meal', async () => {
@@ -224,12 +224,50 @@ describe('Meals routes', () => {
         .get('/meals')
         .set('Authorization', credentials.userAToken);
 
-      const getMealresponse = await request(app.server)
+      const getMealResponse = await request(app.server)
         .get(`/meals/${meals[1].id as string}`)
         .set('Authorization', credentials.userAToken);
 
-      expect(getMealresponse.status).toBe(200);
-      expect(getMealresponse.body.meal).toEqual(meals[1]);
+      expect(getMealResponse.status).toBe(200);
+      expect(getMealResponse.body.meal).toEqual(meals[1]);
+    });
+  });
+
+  describe('GET:meals/statistics', () => {
+    it("should be able to get an user's statistics", async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[2]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[3]);
+
+      const getStatisticsResponse = await request(app.server)
+        .get('/meals/statistics')
+        .set('Authorization', credentials.userAToken);
+
+      const expectedStatistics = {
+        meals_total: 4,
+        meals_on_diet_total: 3,
+        meals_off_diet_total: 1,
+        best_sequence_meals_on_diet: 2,
+      };
+
+      expect(getStatisticsResponse.status).toBe(200);
+      expect(getStatisticsResponse.body.statistics).toEqual(expectedStatistics);
     });
   });
 });
