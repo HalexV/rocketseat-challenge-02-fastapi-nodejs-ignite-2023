@@ -201,5 +201,35 @@ describe('Meals routes', () => {
       expect(getMealresponse.status).toBe(404);
       expect(getMealresponse.body.message).toBe('Meal not found!');
     });
+
+    it('should be able to list a meal', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[2]);
+
+      const {
+        body: { meals },
+      } = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userAToken);
+
+      const getMealresponse = await request(app.server)
+        .get(`/meals/${meals[1].id as string}`)
+        .set('Authorization', credentials.userAToken);
+
+      expect(getMealresponse.status).toBe(200);
+      expect(getMealresponse.body.meal).toEqual(meals[1]);
+    });
   });
 });
