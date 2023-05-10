@@ -41,26 +41,26 @@ async function getCredentials(): Promise<{
 
 const validInputMeals = [
   {
-    name: 'Test meal',
-    description: 'A test meal',
+    name: 'Test meal A',
+    description: 'A test meal A',
     diet: true,
     datetime: new Date('2023-05-01T13:00:00.000Z').toISOString(),
   },
   {
-    name: 'Test meal',
-    description: 'A test meal',
+    name: 'Test meal B',
+    description: 'A test meal B',
     diet: false,
     datetime: new Date('2023-05-01T15:00:00.000Z').toISOString(),
   },
   {
-    name: 'Test meal',
-    description: 'A test meal',
+    name: 'Test meal C',
+    description: 'A test meal C',
     diet: true,
     datetime: new Date('2023-05-02T13:00:00.000Z').toISOString(),
   },
   {
-    name: 'Test meal',
-    description: 'A test meal',
+    name: 'Test meal D',
+    description: 'A test meal D',
     diet: true,
     datetime: new Date('2023-05-03T13:00:00.000Z').toISOString(),
   },
@@ -341,6 +341,34 @@ describe('Meals routes', () => {
 
       expect(editMealResponse.status).toBe(404);
       expect(editMealResponse.body.message).toBe('Meal not found!');
+    });
+
+    it('should be able to edit a meal', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      const {
+        body: { meals },
+      } = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userAToken);
+
+      const editMealResponse = await request(app.server)
+        .put(`/meals/${meals[0].id as string}`)
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      const {
+        body: { meal: editedMeal },
+      } = await request(app.server)
+        .get(`/meals/${meals[0].id as string}`)
+        .set('Authorization', credentials.userAToken);
+
+      expect(editMealResponse.status).toBe(200);
+      expect(editMealResponse.body.message).toBe('Meal updated!');
+      expect(editedMeal).toMatchObject(validInputMeals[1]);
     });
   });
 });
