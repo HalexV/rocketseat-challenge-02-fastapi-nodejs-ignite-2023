@@ -39,6 +39,33 @@ async function getCredentials(): Promise<{
   };
 }
 
+const validInputMeals = [
+  {
+    name: 'Test meal',
+    description: 'A test meal',
+    diet: true,
+    datetime: new Date('2023-05-01T13:00:00.000Z').toISOString(),
+  },
+  {
+    name: 'Test meal',
+    description: 'A test meal',
+    diet: false,
+    datetime: new Date('2023-05-01T15:00:00.000Z').toISOString(),
+  },
+  {
+    name: 'Test meal',
+    description: 'A test meal',
+    diet: true,
+    datetime: new Date('2023-05-02T13:00:00.000Z').toISOString(),
+  },
+  {
+    name: 'Test meal',
+    description: 'A test meal',
+    diet: true,
+    datetime: new Date('2023-05-03T13:00:00.000Z').toISOString(),
+  },
+];
+
 describe('Meals routes', () => {
   let credentials: {
     userAToken: string;
@@ -110,12 +137,7 @@ describe('Meals routes', () => {
       const mealCreateResponse = await request(app.server)
         .post('/meals')
         .set('Authorization', credentials.userAToken)
-        .send({
-          name: 'Test meal',
-          description: 'A test meal',
-          diet: true,
-          datetime: new Date('2023-05-01T13:00:00.000Z').toISOString(),
-        });
+        .send(validInputMeals[0]);
 
       const expectedResponseBody = {
         message: 'Meal created!',
@@ -123,6 +145,35 @@ describe('Meals routes', () => {
 
       expect(mealCreateResponse.status).toBe(201);
       expect(mealCreateResponse.body).toEqual(expectedResponseBody);
+    });
+  });
+
+  describe('GET:meals/', () => {
+    it("should be able to list all user's meals", async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[2]);
+
+      const {
+        body: { meals },
+      } = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userAToken);
+
+      expect(meals[0]).toMatchObject(validInputMeals[0]);
+      expect(meals[1]).toMatchObject(validInputMeals[1]);
+      expect(meals[2]).toMatchObject(validInputMeals[2]);
     });
   });
 });

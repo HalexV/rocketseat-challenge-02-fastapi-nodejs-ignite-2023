@@ -51,6 +51,14 @@ export async function mealsRoutes(app: FastifyInstance): Promise<void> {
 
     const meals = await knex('meals').where({ userId: id });
 
+    meals.forEach((meal) => {
+      if (meal.diet) {
+        meal.diet = true;
+      } else {
+        meal.diet = false;
+      }
+    });
+
     return reply.send({
       meals,
     });
