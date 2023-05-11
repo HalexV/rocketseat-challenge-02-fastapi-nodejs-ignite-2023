@@ -269,6 +269,32 @@ describe('Meals routes', () => {
       expect(getStatisticsResponse.status).toBe(200);
       expect(getStatisticsResponse.body.statistics).toEqual(expectedStatistics);
     });
+
+    it('should not be able to get statistics of another user', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      const getStatisticsResponse = await request(app.server)
+        .get('/meals/statistics')
+        .set('Authorization', credentials.userBToken);
+
+      const expectedStatistics = {
+        meals_total: 0,
+        meals_on_diet_total: 0,
+        meals_off_diet_total: 0,
+        best_sequence_meals_on_diet: 0,
+      };
+
+      expect(getStatisticsResponse.status).toBe(200);
+      expect(getStatisticsResponse.body.statistics).toEqual(expectedStatistics);
+    });
   });
 
   describe('PUT:meals/:id', () => {
