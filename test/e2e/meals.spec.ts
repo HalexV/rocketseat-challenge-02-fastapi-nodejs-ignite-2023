@@ -175,6 +175,30 @@ describe('Meals routes', () => {
       expect(meals[1]).toMatchObject(validInputMeals[1]);
       expect(meals[2]).toMatchObject(validInputMeals[2]);
     });
+
+    it('should not be able to list meals of another user', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[1]);
+
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[2]);
+
+      const listMealResponse = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userBToken);
+
+      expect(listMealResponse.status).toBe(200);
+      expect(listMealResponse.body.meals.length).toBe(0);
+    });
   });
 
   describe('GET:meals/:id', () => {
