@@ -379,5 +379,33 @@ describe('Meals routes', () => {
       expect(deleteMealResponse.status).toBe(404);
       expect(deleteMealResponse.body.message).toEqual('Meal not found!');
     });
+
+    it('should be able to delete a meal', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      const {
+        body: {
+          meals: [myMeal],
+        },
+      } = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userAToken);
+
+      const deleteMealResponse = await request(app.server)
+        .delete(`/meals/${myMeal.id as string}`)
+        .set('Authorization', credentials.userAToken);
+
+      const getMealResponse = await request(app.server)
+        .get(`/meals/${myMeal.id as string}`)
+        .set('Authorization', credentials.userAToken);
+
+      expect(deleteMealResponse.status).toBe(200);
+      expect(deleteMealResponse.body.message).toEqual('Meal deleted!');
+      expect(getMealResponse.status).toBe(404);
+      expect(getMealResponse.body.message).toEqual('Meal not found!');
+    });
   });
 });
