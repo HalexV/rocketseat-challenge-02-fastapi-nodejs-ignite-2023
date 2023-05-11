@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "knex": "node --no-warnings --loader tsx ./node_modules/.bin/knex",
-    "lint": "eslint src --ext .ts --fix && prettier --write src/**/*.ts",
+    "lint": "eslint src test --ext .ts --fix && prettier --write src/**/*.ts test/**/*.ts",
     "test": "vitest --single-thread --reporter='verbose'"
   },
   "keywords": [],
