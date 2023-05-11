@@ -10,7 +10,8 @@
     "dev": "tsx watch src/server.ts",
     "knex": "node --no-warnings --loader tsx ./node_modules/.bin/knex",
     "lint": "eslint src test --ext .ts --fix && prettier --write src/**/*.ts test/**/*.ts",
-    "test": "vitest --single-thread --reporter='verbose'"
+    "test": "vitest --single-thread --reporter='verbose'",
+    "build": "tsup src -d build"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
     "prettier": "^2.8.8",
     "sqlite3": "^5.1.6",
     "supertest": "^6.3.3",
+    "tsup": "^6.7.0",
     "tsx": "^3.12.7",
     "typescript": "^5.0.4",
     "vitest": "^0.31.0"
