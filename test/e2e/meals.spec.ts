@@ -283,8 +283,6 @@ describe('Meals routes', () => {
           diet: 'true',
         });
 
-      console.dir(editMealResponse.body, { depth: null });
-
       const expectedResponse = {
         issues: [
           {
@@ -369,6 +367,17 @@ describe('Meals routes', () => {
       expect(editMealResponse.status).toBe(200);
       expect(editMealResponse.body.message).toBe('Meal updated!');
       expect(editedMeal).toMatchObject(validInputMeals[1]);
+    });
+  });
+
+  describe('DELETE:meals/:id', () => {
+    it('should not be able to delete a meal that does not exist', async () => {
+      const deleteMealResponse = await request(app.server)
+        .delete('/meals/asdf-asdf-asdf-asdf')
+        .set('Authorization', credentials.userAToken);
+
+      expect(deleteMealResponse.status).toBe(404);
+      expect(deleteMealResponse.body.message).toEqual('Meal not found!');
     });
   });
 });
