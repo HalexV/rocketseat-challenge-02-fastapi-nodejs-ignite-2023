@@ -368,6 +368,35 @@ describe('Meals routes', () => {
       expect(editMealResponse.body.message).toBe('Meal updated!');
       expect(editedMeal).toMatchObject(validInputMeals[1]);
     });
+
+    it('should not be able to edit a meal of another user', async () => {
+      await request(app.server)
+        .post('/meals')
+        .set('Authorization', credentials.userAToken)
+        .send(validInputMeals[0]);
+
+      const {
+        body: {
+          meals: [myMeal],
+        },
+      } = await request(app.server)
+        .get('/meals')
+        .set('Authorization', credentials.userAToken);
+
+      const editMealResponse = await request(app.server)
+        .put(`/meals/${myMeal.id as string}`)
+        .set('Authorization', credentials.userBToken)
+        .send(validInputMeals[1]);
+
+      const getMealResponse = await request(app.server)
+        .get(`/meals/${myMeal.id as string}`)
+        .set('Authorization', credentials.userAToken);
+
+      expect(editMealResponse.status).toBe(404);
+      expect(editMealResponse.body.message).toBe('Meal not found!');
+      expect(getMealResponse.status).toBe(200);
+      expect(getMealResponse.body.meal).toMatchObject(validInputMeals[0]);
+    });
   });
 
   describe('DELETE:meals/:id', () => {
