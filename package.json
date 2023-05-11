@@ -39,6 +39,8 @@
     "fastify": "^4.17.0",
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
+    "pg": "^8.10.0",
+    "pg-query-stream": "^4.4.0",
     "zod": "^3.21.4"
   }
 }
